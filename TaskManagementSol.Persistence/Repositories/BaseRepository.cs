@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using TaskManagementSol.Application;
 using TaskManagementSol.Application.Interface;
 using TaskManagementSol.Domain.Model;
 using TaskManagementSol.Persistence.Context;
@@ -11,49 +13,88 @@ namespace TaskManagementSol.Persistence.Repositories
         private readonly TaskManagementContext _dbContext;
         private readonly DbSet<T> _dbSet;
 
-        protected BaseRepository(TaskManagementContext dbContext)
+        public BaseRepository(TaskManagementContext dbContext)
         {
             _dbContext = dbContext;
             _dbSet = dbContext.Set<T>();
         }
 
-        public virtual async Task<(bool IsSuccess, string Message)> CreateAsync(T type)
+        public virtual async Task<Result> CreateAsync(T type)
         {
+            Result result = new Result();
             try
             {
-                await _dbSet.AddAsync(type);
+                _dbSet.Add(type);
                 await _dbContext.SaveChangesAsync();
-                return (true, $"Task {typeof(T)} created successfullly.");
+                result = Result.Success($"Entity created successfully.", type);
+                return result;
             }
             catch (Exception)
             {
-                return (false, "Error creating Task.");
+                result = Result.Failure($"Error saving in DB");
+                return result;
+            }   
+        }
+
+        public virtual async Task<Result> GetAllAsync(Expression<Func<T, bool>> filter)
+        {
+            Result result = new Result();
+            try
+            {
+                var entities = await _dbSet.Where(filter).ToListAsync();
+                result = Result.Success($"Entities returned successfully", entities);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = Result.Failure($"Error returning entities: {ex.Message}");
+                return result;
+            }
+
+        }
+
+        public virtual async Task<Result> GetByIdAsync(int id)
+        {
+            Result result = new Result();
+            try
+            {
+                var entity = await _dbSet.FindAsync(id);
+                if (entity is null)
+                {
+                    result = Result.Failure("Entity not found in DB");
+                    return result;
+                }
+                result = Result.Success($"Entity found successfully", entity);
+                return result;
+
+            }
+            catch (Exception)
+            {
+                result = Result.Failure($"Error finding entity ID {id} in DB");
+                return result;
             }
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
-            => (IEnumerable<T>)await _dbContext.Task_tb.ToListAsync();
-
-
-        public virtual async Task<T> GetByIdAsync(int id)
-            => await _dbSet.FindAsync(id);
-
-        public virtual async Task<(bool IsSuccess, string Message)> UpdateAsync(T type)
+        public virtual async Task<Result> UpdateAsync(T type)
         {
+            Result result = new Result();
             try
             {
                 _dbSet.Update(type);
                 await _dbContext.SaveChangesAsync();
-                return (true, $"Task {typeof(T)} created successfullly.");
+                result = Result.Success($"Task created successfullly.", type);
+                return result;
             }
             catch (Exception)
             {
-                return (false, "Error updating Task.");
+                result = Result.Failure($"Error updating ");
+                return result;
             }
         }
 
-        public virtual async Task<(bool IsSuccess, string Message)> DeleteAsync(int id)
+        public virtual async Task<Result> DeleteAsync(int id)
         {
+            Result result = new Result();
             try
             {
                 var taskExist = await _dbSet.FindAsync(id);
@@ -61,17 +102,20 @@ namespace TaskManagementSol.Persistence.Repositories
                 {
                     _dbSet.Remove(taskExist);
                     await _dbContext.SaveChangesAsync();
-                    return (true, $"Task removed successfully.");
+                    result = Result.Success($"Task removed successfully.");
+                    return result;
                 }
                 else
                 {
-                    return (false, $"Task {id} Not found!");
+                    result = Result.Failure($"Task {id} Not found!");
+                    return result;
                 }
 
             }
             catch (Exception)
             {
-                return (false, "Error deleting Task.");
+                result = Result.Failure("Error deleting Task.");
+                return result;
             }
         }
     }

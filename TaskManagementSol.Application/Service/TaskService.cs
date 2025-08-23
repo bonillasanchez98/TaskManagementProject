@@ -1,4 +1,5 @@
-﻿using TaskManagementSol.Application.Interface.Repos;
+﻿using System.Linq.Expressions;
+using TaskManagementSol.Application.Interface.Repos;
 using TaskManagementSol.Application.Interface.Task;
 using TaskManagementSol.Domain.Model;
 
@@ -16,96 +17,106 @@ namespace TaskManagementSol.Application.Service
         }
 
         //METODOS
-
-        public async Task<(bool IsSuccess, string Message)> CreateAsync(TaskModel taskModel)
+        public async Task<Result> CreateTaskAsync(TaskModel taskModel)
         {
-            var response = new Response<TaskModel>();
+            Result response = new Result();
             try
             {
-                var result = await _repo.CreateAsync(taskModel);
-                response.Message = result.Message;
-                response.Success = result.IsSuccess;
-                return (true, $"Task created successfully.");
-            }
-            catch (Exception e)
-            {
-                response.Errors.Add($"CreateAsync Error: {e.Message}");
-                return (false, e.Message);
-            }
-        }
-
-
-        public async Task<IEnumerable<TaskModel>> GetAllAsync()
-        {
-            var response = new Response<TaskModel>();
-            try
-            {
-                response.DataList = await _repo.GetAllAsync();
-                response.Success = true;
-            }
-            catch (Exception e)
-            {
-                response.Errors.Add($"GetAllAsync Error: {e.Message}");
-            }
-            return response.DataList;
-        }
-
-        public async Task<TaskModel> GetByIdAsync(int id)
-        {
-            var response = new Response<TaskModel>();
-            try
-            {
-                var IdExist = await _repo.GetByIdAsync(id);
-                if(IdExist != null)
+                if (taskModel is null)
                 {
-                    response.SingleData= IdExist;
-                    response.Success = true;
+                    response = Result.Failure("Task cannot be null");
+                    return response;
+                }
+                return await _repo.CreateAsync(taskModel);
+            }
+            catch (Exception e)
+            {
+                response = Result.Failure($"CreateAsyncError: {e.Message}");
+            }
+            return response;
+        }
+
+        public async Task<Result> GetAllTasksAsync()
+        {
+            Result response = new Result();
+            try
+            {
+                var taskResult = await _repo.GetAllAsync(t => t.Status == "Enabled" || t.Status == "Pending" || t.Status == "Completed");
+                if (taskResult.IsSuccess)
+                {
+                    response = Result.Success("Tasks returned successfully", taskResult.Data);
                 }
                 else
                 {
-                    response.Success = false;
-                    response.Message = $"Task {id} not found.";
+                    response = Result.Failure("Failure try getting Tasks.");
                 }
             }
             catch (Exception e)
             {
-                response.Errors.Add($"GetByIdAsync Error: {e.Message}");
+                response = Result.Failure($"GetAllAsync Error: {e.Message}");
             }
-
-            return response.SingleData;
+            return response;
         }
-
-        public async Task<(bool IsSuccess, string Message)> UpdateAsync(TaskModel taskModel)
+        
+        public async Task<Result> GetTaskByIdAsync(int id)
         {
-            var response = new Response<TaskModel>();
+            Result response = new Result();
             try
             {
-                var result = await _repo.UpdateAsync(taskModel);
-                response.Message = result.Message;
-                response.Success = result.IsSuccess;
-                return (true, $"Task updated successfully.");
+                var IdExist = await _repo.GetByIdAsync(id);
+                if (IdExist is null)
+                {
+                    response = Result.Failure($"Task {id} not found.");
+                }
+                response = Result.Success("Task returned successfully", IdExist.Data);
+                
             }
             catch (Exception e)
             {
-                response.Errors.Add($"UpdateAsync Error: {e.Message}");
-                return (false, e.Message);
+                response = Result.Failure($"GetByIdAsync Error: {e.Message}");
             }
+
+            return response;
         }
-        public async Task<(bool IsSuccess, string Message)> DeleteAsync(int id)
+
+        public async Task<Result> UpdateTaskAsync(TaskModel taskModel)
         {
-            var response = new Response<TaskModel>();
+            Result response = new Result();
             try
             {
-                var result = await _repo.DeleteAsync(id);
-                response.Message = result.Message;
-                response.Success = result.IsSuccess;
-                return (true, $"Task deleted successfully.");
+                response = await _repo.UpdateAsync(taskModel);
+                return response;
+
             }
             catch (Exception e)
             {
-                response.Errors.Add($"DeleteAsync Error: {e.Message}");
-                return (false, e.Message);
+                response = Result.Failure($"UpdateAsync Error: {e.Message}");
             }
+            return response;
         }
+
+        public async Task<Result> DeleteTaskByIdAsync(int id)
+        {
+            Result response = new Result();
+            try
+            {
+                var idExist = await _repo.GetByIdAsync(id);
+                if (idExist != null)
+                {
+                    var result = await _repo.DeleteAsync(id);
+                    return Result.Success($"Task ID[{id}] deleted successfully.");
+                }
+                else
+                {
+                    return Result.Failure($"ID[{id}] not found.");
+                }
+            }
+            catch (Exception e)
+            {
+                response = Result.Failure($"DeleteAsync Error: {e.Message}");
+            }
+            return response;
+        }
+
     }
 }

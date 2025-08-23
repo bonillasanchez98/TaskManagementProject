@@ -1,12 +1,14 @@
-﻿namespace TaskManagementSol.Application.Interface
+﻿using System.Linq.Expressions;
+
+namespace TaskManagementSol.Application.Interface
 {
     //Contrato global para operaciones CRUD.
     public interface IBaseRepo<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetByIdAsync(int id);
-        Task<(bool IsSuccess, string Message)> CreateAsync(T type);
-        Task<(bool IsSuccess, string Message)> UpdateAsync(T type);
-        Task<(bool IsSuccess, string Message)> DeleteAsync(int id);
+        Task<Result> GetAllAsync(Expression<Func<T, bool>> filter); //Aplicando genericos
+        Task<Result> GetByIdAsync(int id);
+        Task<Result> CreateAsync(T type);
+        Task<Result> UpdateAsync(T type);
+        Task<Result> DeleteAsync(int id);
     }
 }

@@ -20,7 +20,7 @@ namespace TaskManagementSol.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTaskAsync()
         {
-            var result = await _service.GetAllAsync();
+            var result = await _service.GetAllTasksAsync();
             if(result == null)
             {
                 return BadRequest(result);
@@ -31,7 +31,7 @@ namespace TaskManagementSol.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTaskByIdAsync(int id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _service.GetTaskByIdAsync(id);
             if (result is null)
             {
                 return BadRequest(result);
@@ -42,7 +42,7 @@ namespace TaskManagementSol.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTaskAsync(TaskModel taskModel)
         {
-            var result = await _service.CreateAsync(taskModel);
+            var result = await _service.CreateTaskAsync(taskModel);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
@@ -53,7 +53,7 @@ namespace TaskManagementSol.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateTaskAsync(TaskModel taskModel)
         {
-            var result = await _service.UpdateAsync(taskModel);
+            var result = await _service.UpdateTaskAsync(taskModel);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
@@ -64,7 +64,7 @@ namespace TaskManagementSol.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTaskByIdAsync(int id)
         {
-            var result = await _service.DeleteAsync(id);
+            var result = await _service.DeleteTaskByIdAsync(id);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
