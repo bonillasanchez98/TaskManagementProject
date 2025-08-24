@@ -15,14 +15,9 @@ namespace TaskManagementSol.Persistence.Repositories.TaskRepo
 
         public override Task<Result> CreateAsync(TaskModel taskModel)
         {
-            Result result = new Result();
-            if (taskModel.Description.Length < 5)
-            {
-                result = Result.Failure("The description cannot be to short");
-            }
             return base.CreateAsync(taskModel);
         }
-
+        
         public override Task<Result> GetAllAsync(Expression<Func<TaskModel, bool>> filter)
         {
             return base.GetAllAsync(filter);
@@ -43,4 +38,6 @@ namespace TaskManagementSol.Persistence.Repositories.TaskRepo
             return base.DeleteAsync(id);
         }
     }
+
+
 }

@@ -82,7 +82,7 @@ namespace TaskManagementSol.Persistence.Repositories
             {
                 _dbSet.Update(type);
                 await _dbContext.SaveChangesAsync();
-                result = Result.Success($"Task created successfullly.", type);
+                result = Result.Success($"Task updated successfullly.", type);
                 return result;
             }
             catch (Exception)

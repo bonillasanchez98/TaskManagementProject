@@ -5,6 +5,9 @@ using TaskManagementSol.Domain.Model;
 
 namespace TaskManagementSol.Application.Service
 {
+    //Cabecera del delegate
+    public delegate Result ValidateTask(TaskModel task);
+
     public class TaskService : ITaskService
     {
         //ATRIBUTOS
@@ -22,11 +25,19 @@ namespace TaskManagementSol.Application.Service
             Result response = new Result();
             try
             {
-                if (taskModel is null)
+                ValidateTask validateTask = new ValidateTask(ValidateTaskBody); //Case: ValidandoTask
+                if (!validateTask(taskModel).IsSuccess)
                 {
-                    response = Result.Failure("Task cannot be null");
+                    response = Result.Failure($"Task invalid format");
                     return response;
                 }
+
+                //Case: TaskCreationNotify
+                Action<string> taskCreationNotify = tcn => 
+                Console.Write($"Task created: {taskModel.Description}\n" +
+                                   $"DueTime: {taskModel.DueTime}");
+                Console.WriteLine(taskCreationNotify);
+
                 return await _repo.CreateAsync(taskModel);
             }
             catch (Exception e)
@@ -92,6 +103,11 @@ namespace TaskManagementSol.Application.Service
             {
                 response = Result.Failure($"UpdateAsync Error: {e.Message}");
             }
+            Action<string> taskModifyNotify = tcn =>
+                Console.Write($"Task modify: {taskModel.Description}\n" +
+                                   $"DueTime: {taskModel.DueTime}\n" +
+                                   $"Status: {taskModel.Status}");
+            Console.WriteLine(taskModifyNotify);
             return response;
         }
 
@@ -118,5 +134,15 @@ namespace TaskManagementSol.Application.Service
             return response;
         }
 
+        //Cuerpo del ValidateTaskBody
+        private Result ValidateTaskBody(TaskModel task)
+        {
+            if (!String.IsNullOrWhiteSpace(task.Description) && task.DueTime > DateTime.Now)
+            {
+                return Result.Success($"Task: {task}");
+            }
+            return Result.Failure("Description or Duetime invalid");
+        }
+        
     }
 }

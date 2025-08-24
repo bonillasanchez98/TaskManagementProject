@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskManagementSol.Application;
 using TaskManagementSol.Application.Interface.Task;
 using TaskManagementSol.Domain.Model;
+using TaskManagementSol.Persistence.Repositories.TaskRepo;
 
 namespace TaskManagementSol.Api.Controllers
 {
