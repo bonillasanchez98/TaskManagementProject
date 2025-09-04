@@ -1,4 +1,7 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading.Tasks;
 using TaskManagementSol.Application.Interface.Repos;
 using TaskManagementSol.Application.Interface.Task;
 using TaskManagementSol.Domain.Model;
@@ -25,6 +28,13 @@ namespace TaskManagementSol.Application.Service
             Result response = new Result();
             try
             {
+                var exist = await _repo.ExistAsync(t => t.Id == taskModel.Id); //Case: TaskIdExist
+                if (exist.IsSuccess)
+                {
+                    response = Result.Failure($"ID [{taskModel.Id}] already exist");
+                    return response;
+                }
+
                 ValidateTask validateTask = new ValidateTask(ValidateTaskBody); //Case: ValidandoTask
                 if (!validateTask(taskModel).IsSuccess)
                 {
@@ -32,11 +42,7 @@ namespace TaskManagementSol.Application.Service
                     return response;
                 }
 
-                //Case: TaskCreationNotify
-                Action<string> taskCreationNotify = tcn => 
-                Console.Write($"Task created: {taskModel.Description}\n" +
-                                   $"DueTime: {taskModel.DueTime}");
-                Console.WriteLine(taskCreationNotify);
+                TaskCreationNotify(taskModel); //Case: TaskCreationNotify
 
                 return await _repo.CreateAsync(taskModel);
             }
@@ -74,12 +80,24 @@ namespace TaskManagementSol.Application.Service
             Result response = new Result();
             try
             {
-                var IdExist = await _repo.GetByIdAsync(id);
-                if (IdExist is null)
+                var exist = await _repo.ExistAsync(t => t.Id == id); //Case: TaskIdExist
+                if (exist.IsSuccess)
                 {
-                    response = Result.Failure($"Task {id} not found.");
+                    response = Result.Success("Task returned successfully", exist.Data);
+
+                    //Case: CalculateDaysLeft
+                    Func<TaskModel, int> calculateDays = task => (task.DueTime.Day - DateTime.Now.Day);
+                    int daysLeft = calculateDays(exist.Data);
+                    Console.WriteLine($"Task: {id} \n" +
+                                              $"Days left: {daysLeft}");
+
+                    return response;
                 }
-                response = Result.Success("Task returned successfully", IdExist.Data);
+                else
+                {
+                    response = Result.Failure($"Task ID [{id}] not found.");
+                    return response;
+                }
                 
             }
             catch (Exception e)
@@ -103,14 +121,9 @@ namespace TaskManagementSol.Application.Service
             {
                 response = Result.Failure($"UpdateAsync Error: {e.Message}");
             }
-            Action<string> taskModifyNotify = tcn =>
-                Console.Write($"Task modify: {taskModel.Description}\n" +
-                                   $"DueTime: {taskModel.DueTime}\n" +
-                                   $"Status: {taskModel.Status}");
-            Console.WriteLine(taskModifyNotify);
             return response;
         }
-
+        
         public async Task<Result> DeleteTaskByIdAsync(int id)
         {
             Result response = new Result();
@@ -134,6 +147,29 @@ namespace TaskManagementSol.Application.Service
             return response;
         }
 
+        //Case: 
+        public async Task<Result> GetPendingTasks()
+        {
+            Result response = new Result();
+            try
+            {
+                var taskResult = await _repo.GetAllAsync(t => t.Status == "Pending");
+                if (taskResult.IsSuccess)
+                {
+                    response = Result.Success("Tasks pending", taskResult.Data);
+                }
+                else
+                {
+                    response = Result.Failure("Failure try getting pending Tasks.");
+                }
+            }
+            catch (Exception e)
+            {
+                response = Result.Failure($"GetPendingTasks Error: {e.Message}");
+            }
+            return response;
+        }
+
         //Cuerpo del ValidateTaskBody
         private Result ValidateTaskBody(TaskModel task)
         {
@@ -143,6 +179,12 @@ namespace TaskManagementSol.Application.Service
             }
             return Result.Failure("Description or Duetime invalid");
         }
-        
+
+
+
+        //Delegado para notificar la creacion de una Task
+        private Action<TaskModel> TaskCreationNotify = tcn =>
+                Console.Write($"Task created: {tcn.Id}\n" +
+                                   $"DueTime: {tcn.DueTime}");
     }
 }

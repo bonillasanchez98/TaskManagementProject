@@ -10,5 +10,6 @@ namespace TaskManagementSol.Application.Interface
         Task<Result> CreateAsync(T type);
         Task<Result> UpdateAsync(T type);
         Task<Result> DeleteAsync(int id);
+        Task<Result> ExistAsync(Expression<Func<T, bool>> filter);
     }
 }

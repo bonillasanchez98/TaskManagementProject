@@ -22,7 +22,17 @@ namespace TaskManagementSol.Api.Controllers
         public async Task<IActionResult> GetAllTaskAsync()
         {
             var result = await _service.GetAllTasksAsync();
-            if(result == null)
+            if (result == null)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpGet("pending-tasks")]
+        public async Task<IActionResult> GetPendingTasks()
+        {
+            var result = await _service.GetPendingTasks();
+            if (result == null)
             {
                 return BadRequest(result);
             }
@@ -33,7 +43,7 @@ namespace TaskManagementSol.Api.Controllers
         public async Task<IActionResult> GetTaskByIdAsync(int id)
         {
             var result = await _service.GetTaskByIdAsync(id);
-            if (result is null)
+            if (!result.IsSuccess)
             {
                 return BadRequest(result);
             }

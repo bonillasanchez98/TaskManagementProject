@@ -6,12 +6,12 @@ namespace TaskManagementSol.Application.Interface.Task
     public interface ITaskService
     {
         //Metodo para obtener una tarea segun su estatus.
-        //Task<string> GetTaskByStatus(string status); //Deberia de devolver un Response.
+        Task<Result> GetPendingTasks(); //Case: PendingTasks
         Task<Result> GetAllTasksAsync();
         Task<Result> GetTaskByIdAsync(int id);
         Task<Result> CreateTaskAsync(TaskModel task);
         Task<Result> UpdateTaskAsync(TaskModel task);
         Task<Result> DeleteTaskByIdAsync(int id);
-
+        
     }
 }

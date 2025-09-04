@@ -118,5 +118,18 @@ namespace TaskManagementSol.Persistence.Repositories
                 return result;
             }
         }
+
+        public virtual async Task<Result> ExistAsync(Expression<Func<T, bool>> filter)
+        {
+            Result result = new Result();
+            
+            var exist = await _dbSet.AsNoTracking()
+                              .SingleOrDefaultAsync(filter);
+            if(exist != null)
+            {
+                return result = Result.Success($"{typeof(T)} exist", exist);
+            }
+            return result;
+        }
     }
 }
