@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using TaskManagementSol.Application;
 using TaskManagementSol.Application.Interface;
-using TaskManagementSol.Domain.Model;
 using TaskManagementSol.Persistence.Context;
 
 namespace TaskManagementSol.Persistence.Repositories

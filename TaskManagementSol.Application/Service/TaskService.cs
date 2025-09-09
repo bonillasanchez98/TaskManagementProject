@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Threading.Tasks;
-using TaskManagementSol.Application.Interface.Repos;
+﻿using TaskManagementSol.Application.Interface.Repos;
 using TaskManagementSol.Application.Interface.Task;
+using TaskManagementSol.Domain.Factory;
 using TaskManagementSol.Domain.Model;
 
 namespace TaskManagementSol.Application.Service
@@ -147,7 +144,28 @@ namespace TaskManagementSol.Application.Service
             return response;
         }
 
-        //Case: 
+        //Case: Crear tarea de alta prioridad
+        public async Task<Result> CreateHighPriorityTaskAsync(string description)
+        {
+            Result response = new Result();
+            try
+            {
+                if (String.IsNullOrWhiteSpace(description))
+                {
+                    response = Result.Failure("The description cannot be null");
+                }
+                var taskHigPriority = TaskModelFactory.CreateHighPrioriyTask(description);
+                return await _repo.CreateAsync(taskHigPriority);
+            }
+            catch (Exception e)
+            {
+                response = Result.Failure($"CreateHighPrioriyTask Error: {e.Message}");
+            }
+            return response;
+        }
+
+
+        //Case: Obtener todas las tareas con estado pendiente
         public async Task<Result> GetPendingTasks()
         {
             Result response = new Result();
@@ -180,11 +198,9 @@ namespace TaskManagementSol.Application.Service
             return Result.Failure("Description or Duetime invalid");
         }
 
-
-
         //Delegado para notificar la creacion de una Task
         private Action<TaskModel> TaskCreationNotify = tcn =>
-                Console.Write($"Task created: {tcn.Id}\n" +
+                Console.Write($"Task created: {tcn.Description}\n" +
                                    $"DueTime: {tcn.DueTime}");
     }
 }

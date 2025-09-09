@@ -12,6 +12,8 @@ namespace TaskManagementSol.Application.Interface.Task
         Task<Result> CreateTaskAsync(TaskModel task);
         Task<Result> UpdateTaskAsync(TaskModel task);
         Task<Result> DeleteTaskByIdAsync(int id);
-        
+
+        //Case: Crear tarea de alta prioridad
+        Task<Result> CreateHighPriorityTaskAsync(string description);
     }
 }

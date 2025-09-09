@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TaskManagementSol.Application;
+﻿using Microsoft.AspNetCore.Mvc;
 using TaskManagementSol.Application.Interface.Task;
 using TaskManagementSol.Domain.Model;
-using TaskManagementSol.Persistence.Repositories.TaskRepo;
 
 namespace TaskManagementSol.Api.Controllers
 {
@@ -18,6 +15,7 @@ namespace TaskManagementSol.Api.Controllers
             _service = service;
         }
 
+        //ENDPOINTS
         [HttpGet]
         public async Task<IActionResult> GetAllTaskAsync()
         {
@@ -28,6 +26,7 @@ namespace TaskManagementSol.Api.Controllers
             }
             return Ok(result);
         }
+
         [HttpGet("pending-tasks")]
         public async Task<IActionResult> GetPendingTasks()
         {
@@ -54,6 +53,16 @@ namespace TaskManagementSol.Api.Controllers
         public async Task<IActionResult> AddTaskAsync(TaskModel taskModel)
         {
             var result = await _service.CreateTaskAsync(taskModel);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpPost("high-priority")]
+        public async Task<IActionResult> AddHighPriorityTask(string description)
+        {
+            var result = await _service.CreateHighPriorityTaskAsync(description);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
