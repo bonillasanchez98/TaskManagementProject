@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35521.163 d17.12
+VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{AAD1F991-883F-4A1A-96E0-DDD999A9B22C}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementSol.Persistence", "TaskManagementSol.Persistence\TaskManagementSol.Persistence.csproj", "{66FFD8FF-8AD5-4841-B138-EE9530E69B26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementSol.Api", "TaskManagementSol.Api\TaskManagementSol.Api.csproj", "{E6C2CB04-04D0-4890-BE9F-6016D198E135}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST", "TEST", "{217B8CE6-D26A-408E-81F6-841B69548067}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementSol.Test", "TaskManagementSol.Test\TaskManagementSol.Test.csproj", "{A96B8358-77D1-465B-9CDD-B0CD5DF4943C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,10 @@ Global
 		{E6C2CB04-04D0-4890-BE9F-6016D198E135}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6C2CB04-04D0-4890-BE9F-6016D198E135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6C2CB04-04D0-4890-BE9F-6016D198E135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A96B8358-77D1-465B-9CDD-B0CD5DF4943C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A96B8358-77D1-465B-9CDD-B0CD5DF4943C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A96B8358-77D1-465B-9CDD-B0CD5DF4943C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A96B8358-77D1-465B-9CDD-B0CD5DF4943C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,5 +56,6 @@ Global
 		{5172EA61-09DF-4BEC-86CB-0A5E8E39B454} = {AE3C4236-2756-49F1-8BEE-20ACBB34B4D9}
 		{66FFD8FF-8AD5-4841-B138-EE9530E69B26} = {922A0C47-8170-4CA9-8259-DE21C901965F}
 		{E6C2CB04-04D0-4890-BE9F-6016D198E135} = {AAD1F991-883F-4A1A-96E0-DDD999A9B22C}
+		{A96B8358-77D1-465B-9CDD-B0CD5DF4943C} = {217B8CE6-D26A-408E-81F6-841B69548067}
 	EndGlobalSection
 EndGlobal
